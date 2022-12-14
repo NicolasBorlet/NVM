@@ -8,21 +8,18 @@ fs.ensureDir(dir, (err) => {
     const fs = require("fs-extra");
     const crypto = require("crypto");
 
-    const data = "some data to hash";
-
     const hash = crypto.createHash("sha256");
-    hash.update(data + i);
-
-    const filePath = path.join(__dirname, "./");
+    hash.update(i.toString());
 
     const hashValue = hash.digest("hex");
 
-    fs.mkdirSync(hashValue);
+    const dirPath = path.join(__dirname, "data", `${hashValue}`);
+
+    fs.ensureDirSync(dirPath);
 
     const image = Buffer.alloc(16);
-    fs.writeFileSync(filePath, `image.png`);
+    fs.outputFileSync(path.join(dirPath, "image.png"), image);
 
-    const text = "This is a text file";
-    fs.writeFileSync(filePath, `toto.txt`);
+    fs.outputFileSync(path.join(dirPath, "toto.txt"), hashValue);
   }
 });
