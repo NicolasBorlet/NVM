@@ -1,7 +1,6 @@
 const path = require("node:path");
 const fs = require("fs-extra");
 const crypto = require("crypto");
-const hash = crypto.createHash("sha256");
 
 const tab = [];
 
@@ -13,7 +12,8 @@ const main = async () => {
   console.time("timer");
 
   await Promise.all(
-    tab.map(async () => {
+    tab.map(async (i) => {
+      const hash = crypto.createHash("sha256");
       hash.update(i.toString());
 
       const hashValue = hash.digest("hex");
@@ -22,7 +22,7 @@ const main = async () => {
       await fs.ensureDir(dirPath);
       const image = Buffer.alloc(16);
 
-      return Promise.all([
+      await Promise.all([
         fs.outputFile(path.join(dirPath, "image.png"), image),
         fs.outputFile(path.join(dirPath, "toto.txt"), hashValue),
       ]);
