@@ -1,25 +1,34 @@
-const fs = require("fs-extra");
 const path = require("node:path");
+const fs = require("fs-extra");
+const crypto = require("crypto");
+const hash = crypto.createHash("sha256");
 
-const dir = "../prout/";
+const tab = [];
 
-fs.ensureDir(dir, (err) => {
-  for (var i = 0; i < 2; i++) {
-    const fs = require("fs-extra");
-    const crypto = require("crypto");
+for (var i = 0; i < 500; i++) {
+  tab.push(i);
+}
 
-    const hash = crypto.createHash("sha256");
-    hash.update(i.toString());
+const main = async () => {
+  console.time("timer");
 
-    const hashValue = hash.digest("hex");
+  await Promise.all(
+    tab.map(async () => {
+      hash.update(i.toString());
 
-    const dirPath = path.join(__dirname, "data", `${hashValue}`);
+      const hashValue = hash.digest("hex");
+      const dirPath = path.join(__dirname, "data", `${hashValue}`);
 
-    fs.ensureDirSync(dirPath);
+      await fs.ensureDir(dirPath);
+      const image = Buffer.alloc(16);
 
-    const image = Buffer.alloc(16);
-    fs.outputFileSync(path.join(dirPath, "image.png"), image);
+      return Promise.all([
+        fs.outputFile(path.join(dirPath, "image.png"), image),
+        fs.outputFile(path.join(dirPath, "toto.txt"), hashValue),
+      ]);
+    })
+  );
+  console.timeEnd("timer");
+};
 
-    fs.outputFileSync(path.join(dirPath, "toto.txt"), hashValue);
-  }
-});
+main();
